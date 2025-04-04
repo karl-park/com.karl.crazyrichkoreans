@@ -2,9 +2,21 @@
 
 import { useState } from "react";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface History {
+  results: [number];
+  quote: Quote;
+};
+
+type Quote = {
+  QUOTE: string,
+  AUTHOR: string,
+  GENRE: string
+}
+
 export default function Home() {
-  
-  const [histories, setHistories] = useState([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [histories, setHistories] = useState([] as any);
   const [loading, setLoading] = useState(false);
 
   const generateNumber = async () => {
@@ -12,8 +24,8 @@ export default function Home() {
     try {
       const res = await fetch('/api/generator');
       const json = await res.json();
-      histories.unshift(json);
-      setHistories(histories)
+      histories.unshift(json as History);
+      setHistories(histories);
     } catch (e) {
       console.error('Error fetching CSV:', e);
     } finally {
@@ -26,7 +38,7 @@ export default function Home() {
         <div className="flex flex-col items-center p-7 rounded-2xl">
           <h1>Crazy Rich Koreans</h1>
           <p>Welcome</p>
-          <p></p>
+          <p></p> 
           <p>v0.0.1</p>
         </div>
 
@@ -36,23 +48,33 @@ export default function Home() {
           </button>
 
           <div style={{ marginTop: 20 }}>
-            { histories.length > 0 ? histories.map((history, i) => <div key={i} className="max-w-sm rounded overflow-hidden shadow-lg">
+            { histories.length > 0 ? histories.map(function (history: History, i: number) {
+              // let quote = (history["quote"] as object)["QUOTE"];
+              // let author = history["quote"]["AUTHOR"];
+              // let result = history["results"].join(", ");
+
+              const quote = history.quote.QUOTE;
+              const author = history.quote.AUTHOR;
+              const result = history.results.join(", ");
+
+              return (<div key={i} className="max-w-sm rounded overflow-hidden shadow-lg">
                   <div className="px-6 py-4">
                     <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                      {history["quote"]["QUOTE"]}
+                      { quote }
                     </h5>
 
                     <p className="font-normal text-gray-700 dark:text-gray-400 text-right">
-                      {history["quote"]["AUTHOR"]}
+                      { author }
                     </p>
 
                     <br/>
                     
                     <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white text-center">
-                      {history["results"].join(", ")}
+                      { result }
                     </h5>
                   </div>
-                </div>) : (
+                </div>
+              )}) : (
               <p>No data loaded yet.</p>
             )}
           </div>
